@@ -1,0 +1,171 @@
+#登录
+mongo 192.168.1.1.2/test -u xxx -p xxxx
+#不写则连接本地数据库
+#创建使用数据库
+use stu
+#查看数据库
+show dbs
+#数据插入
+db.class.insert({"name":'lily',"age":17})
+#数据库命名规则
+#utf-8 不能含有空格 . / \ '\0'字符
+
+#不能超过64字节 不能和系统库重名
+
+#全局变量 db:代表当前正在使用的数据库
+#不选择任何数据库　db=test
+
+#数据库的删除
+use stu
+db.dropDatabase()
+
+#数据备份恢复命令
+
+#备份命令：
+mongodump -h 127.0.0.1 -d stu -o .  # . 就是备份到当前目录　ls 查看
+
+#恢复命令
+mongorestore -h 127.0.0.1:27017 -d  stu diama
+
+
+#查看数据库的运行状态
+mongostat
+
+insert query update delete #每秒增删次数
+
+
+
+#创建集合
+db.createCollection(name)
+
+db.createCollection('class1')
+db.class1.insert()#插入数据，如果集合不存在，自动创建集合
+
+#查看集合
+show collections
+show tables
+
+
+#删除集合
+db.class.drop()
+
+
+#获取集合对象
+db.getCollection('class')
+
+
+#集合重命名
+db.class2.renameCollection("class0")
+
+#插值
+db.class.insert([{"name":'sa',"age":25},{"name":"sas","age":23}])
+#插入一个文档   
+db.class0.insertOne({"name":'lucy','age':18,'sex':'w'})
+db.class0.insertMany([{name:"百合",age:33,sex:"w"},{name:"阿荣",age:28,sex:"w"},{name:"小雪",age:46,sex:'m'}])
+
+db.class0.insertOne({"name":'小许','age':46,'sex':'m'})
+
+#ObjectId 如果没有主键　将自动生成　不重复　
+db.class.find()
+#查看文档
+db.class0.find()
+
+
+#创建grade 数据库　class集合　数据若干
+use grade
+db.class.insertMany([{name:"张三",age:14,sex:'w',hobby:["sing",'python','dance','draw']},
+{name:"李四",age:8,sex:'w',hobby:['python','dance']},
+{name:"王五",age:7,sex:'m',hobby:["sing",'dance','draw']},
+{name:"小明",age:13,sex:'m',hobby:["computer",'python','football','draw']},
+{name:"小花",age:11,sex:'w',hobby:["basketball",'python','football','draw']}])
+
+db.class.insertOne({name:"尚书",age:8,sex:'m',hobby:['python','dance','computer']})
+
+
+
+#插入一条或多条文档　同insert相同
+db.class.save({name:"Alex",age:18,sex:'m',hobby:['python','dance','computer']})
+
+#当id冲突的时候替换掉原来文档
+db.class.save({_id:1,name:"Alex",age:18,sex:'m',hobby:['python','dance','computer']})
+
+#查找操作
+db.class.find({},{_id:0})#第一个括号查找条件，第二个括号查找字段(filed)
+db.class.find({age:18},{_id:0})
+db.class.find({age:{$lt:17}},{_id:0})
+db.class.find({age:{$lte:17}},{_id:0})
+db.class.find({age:{$gt:17}},{_id:0})
+db.class.find({age:{$gte:17}},{_id:0})
+db.class.find({age:{$ne:17}},{_id:0})
+db.class.find({age:{$in:[10,11,12,17,18]}},{_id:0})
+db.class.find({age:{$nin:[10,11,12,17,18]}},{_id:0})
+db.class.find({age:{$gt:17,$lte:18}},{_id:0})
+db.class.find({age:{$gt:17},sex:'w'},{_id:0})
+db.class.find({$and:[{age:{$gt:17}},{name:{$lt:'Lily'}}]},{_id:0})
+
+db.class.find({$or:[{age:{$lt:17}},{sex:'m'}]},{_id:0})
+
+db.class.find({age:{$not:{$lt:15}}},{_id:0})
+
+#多个条件均为假　才为真 既不也不
+db.class.find({$nor:[{age:{$gt:16}},{sex:'w'}]},{_id:0})
+
+
+db.class.findOne()
+
+db.class.findOne({age:17},{_id:0})
+
+
+#混合条件语句
+db.class.find({$and:[{$or:[{age:{$lt:15}},{age:{$gt:17}}]},{sex:'w'}]},{_id:0})
+
+
+#数组操作
+db.class2.insertOne({name:'小明',age:10,score:[87,69,81]})
+db.class2.insertOne({name:'小刚',age:20,score:[97,49,81]})
+
+db.class2.find({score:69},{_id:0})
+
+db.class2.find({score:{$gt:90}},{_id:0})
+db.class2.find({score:{$size:3}},{_id:0})
+#同时包含81,69这两项
+db.class2.find({score:{$all:[81,69]}},{_id:0})
+
+db.class2.find({},{_id:0,score:{$slice:2}})
+#跳过数组第一项，显示后两项
+db.class2.find({},{_id:0,score:{$slice:[1,2]}})
+
+#查找数组第二项大于80　　score.1 代表第二项
+db.class2.find({'score.1':{$gt:88}},{_id:0})
+
+
+#其他操作
+$exists
+#判断一个字段是否存在
+db.class2.find({age:{$exists:true}},{_id:0})
+#余数查找
+db.class2.find({age:{$mod:[2,0]}},{_id:0})
+
+#根据数据类型筛选 1:double 2:string 4:array 9:date 5:Binary data
+db.class2.find({age:{$type:1}},{_id:0})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
